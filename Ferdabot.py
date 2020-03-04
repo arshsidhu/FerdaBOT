@@ -1,11 +1,13 @@
+
 import random, os, asyncio, discord, pymongo, json
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from discord.ext import commands, tasks
 from pymongo import MongoClient
 from datetime import datetime
 from tabulate import tabulate
-from pandas.plotting import table 
+from pandas.plotting import table
 
 DBPASS = str(os.environ.get("DBPASS"))
 cluster = MongoClient(DBPASS)
@@ -55,12 +57,14 @@ async def add(ctx, user: discord.User, *name):
     if len(fullname) > MAX_NAME_LENGTH:
         await ctx.send(f'{fullname} too long, use a nickname')
         return
-    
+
     defaultjson = open("dbformat.json")
     data = json.load(defaultjson)
 
     data["name"] = fullname
+    
     data["username"] = user.id
+
     data["log"].append("Added to the boys - " + str(datetime.today()))
 
     boys.insert(data)
@@ -99,6 +103,7 @@ async def display(ctx):
 
     await ctx.send(file=discord.File('ferdatable.png'))
 
+
 @client.command(description = "user - discord @ of who you'd like to recognize for being FERDA\nreason - reason why they're FERDA")
 async def ferda(ctx, user: discord.User, *reason):
     """Recognize one of the boys for being FERDA"""
@@ -118,8 +123,6 @@ async def ferda(ctx, user: discord.User, *reason):
     if len(fullreason) > MAX_REASON_LENGTH:
         await ctx.send(f'{fullreason} too long, please paraphrase')
         return
-
-    
 
     ferda = boys.find_one_and_update(
         {"username":user.id},
@@ -161,5 +164,5 @@ async def negferda(ctx, user: discord.User, reason):
     # await ctx.author.send(":pinching_hand: :eggplant:")
     await ctx.send(f'{user.name} is so not ferda')
 
-TOKEN= str(os.environ.get("TOKEN"))
+TOKEN = str(os.environ.get("TOKEN"))
 client.run(TOKEN)
